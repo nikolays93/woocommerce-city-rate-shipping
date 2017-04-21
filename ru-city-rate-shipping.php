@@ -1,7 +1,7 @@
 <?php
 /**
- * Class Name: Shipping Fixed Rates for each city
- * Class URI: https://github.com/nikolays93/woocommerce-ru-city-rate-shipping
+ * Plugin Name: Shipping Fixed Rates for each city
+ * Plugin URI: https://github.com/nikolays93/woocommerce-ru-city-rate-shipping
  * Description: Custom rates for russian's cities
  * Version: 0.1
  * Author: NikolayS93
