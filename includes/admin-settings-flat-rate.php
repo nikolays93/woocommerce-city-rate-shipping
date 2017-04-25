@@ -6,14 +6,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $cost_desc = __( 'Enter a cost (excl. tax) or sum, e.g. <code>10.00 * [qty]</code>.', 'woocommerce' ) . '<br/><br/>' . __( 'Use <code>[qty]</code> for the number of items, <br/><code>[cost]</code> for the total cost of items, and <code>[fee percent="10" min_fee="20" max_fee=""]</code> for percentage based fees.', 'woocommerce' );
 
-$countries = include( CUSTOM_SHIPPING_DIR . '/includes/list-countries.php' );
-$cities    = include( CUSTOM_SHIPPING_DIR . '/includes/list-cities-ru.php' );
+$states = include( CUSTOM_SHIPPING_DIR . '/includes/list-states.php' );
+$cities = include( CUSTOM_SHIPPING_DIR . '/includes/list-cities-ru.php' );
 
 $list_areas = array();
-foreach ($countries['RU'] as $country => $country_label) {
-	$list_areas[$country] = $country_label;
-	if( isset($cities[$country]) ){
-		foreach ($cities[$country] as $city_label) {
+foreach ($states['RU'] as $state => $state_label) {
+	$list_areas[$state] = $state_label;
+	if( isset($cities[$state]) ){
+		foreach ($cities[$state] as $city_label) {
 			$list_areas[$city_label] = '-- '.$city_label;
 		}
 	}
@@ -30,16 +30,6 @@ $settings = array(
 		'default'		=> __( 'Delivery to the city', 'woocommerce' ),
 		'desc_tip'		=> true,
 	),
-	// 'tax_status' => array(
-	// 	'title' 		=> __( 'Tax status', 'woocommerce' ),
-	// 	'type' 			=> 'select',
-	// 	'class'         => 'wc-enhanced-select',
-	// 	'default' 		=> 'taxable',
-	// 	'options'		=> array(
-	// 		'taxable' 	=> __( 'Taxable', 'woocommerce' ),
-	// 		'none' 		=> _x( 'None', 'Tax status', 'woocommerce' ),
-	// 	),
-	// ),
 	'zone' => array(
 		'title' 		=> __( 'cities', 'woocommerce' ),
 		'type' 			=> 'select',
@@ -57,8 +47,8 @@ $settings = array(
 	),
 );
 
+/*
 $shipping_classes = WC()->shipping->get_shipping_classes();
-
 if ( ! empty( $shipping_classes ) ) {
 	$settings['class_costs'] = array(
 		'title'			 => __( 'Shipping class costs', 'woocommerce' ),
@@ -71,7 +61,7 @@ if ( ! empty( $shipping_classes ) ) {
 			continue;
 		}
 		$settings[ 'class_cost_' . $shipping_class->term_id ] = array(
-			/* translators: %s: shipping class name */
+			// * translators: %s: shipping class name * //
 			'title'       => sprintf( __( '"%s" shipping class cost', 'woocommerce' ), esc_html( $shipping_class->name ) ),
 			'type'        => 'text',
 			'placeholder' => __( 'N/A', 'woocommerce' ),
@@ -99,5 +89,5 @@ if ( ! empty( $shipping_classes ) ) {
 		),
 	);
 }
-
+*/
 return $settings;

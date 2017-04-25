@@ -1,29 +1,5 @@
 <?php
-/**
- * Plugin Name: Shipping Fixed Rates for each city
- * Plugin URI: https://github.com/nikolays93/woocommerce-ru-city-rate-shipping
- * Description: Custom rates for russian's cities
- * Version: 0.1
- * Author: NikolayS93
- * Author URI: https://vk.com/nikolays_93
- * License: GNU General Public License v2 or later
- * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- */
 
-if ( ! defined( 'ABSPATH' ) )
-	exit;
-
-if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) )
-	return;
-
-define('CUSTOM_SHIPPING_DIR', plugin_dir_path( __FILE__ ));
-
-require_once( CUSTOM_SHIPPING_DIR . '/includes/settings-countries.php' );
-
-/**
- * Class Method
- */
-add_action( 'woocommerce_shipping_init', 'custom_shipping_init' );
 function custom_shipping_init(){
 	/**
 	 * @class 		WC_Shipping_Custom
@@ -31,7 +7,7 @@ function custom_shipping_init(){
 	 */
 	class WC_Shipping_Custom extends WC_Shipping_Method {
 
-		/** @var string cost passed to [fee] shortcode */
+		protected $file_settings = 'admin-settings-flat-rate.php';
 		protected $fee_cost = '';
 
 		/**
@@ -56,7 +32,7 @@ function custom_shipping_init(){
 		 * init user set variables.
 		 */
 		public function init() {
-			$this->instance_form_fields = include( 'includes/settings-flat-rate.php' );
+			$this->instance_form_fields = include( $this->file_settings );
 			$this->title                = $this->get_option( 'title' );
 			$this->zone                 = $this->get_option( 'zone' );
 			$this->cost                 = $this->get_option( 'cost' );
@@ -281,26 +257,3 @@ function custom_shipping_init(){
 		}
 	}
 }
-
-/**
- * Register Method
- */
-add_filter( 'woocommerce_shipping_methods', 'add_custom_shipping_method' );
-function add_custom_shipping_method( $methods ) {
-	$methods['custom_shipping_method'] = 'WC_Shipping_Custom';
-	return $methods;
-}
-
-
-
-function custom_shipping_wc_checkout_fields( $fields ) {
-
-	if( WC()->customer->get_shipping_city() ){
-		$fields['billing']['billing_city']['value']   = WC()->customer->get_shipping_city();
-		$fields['shipping']['shipping_city']['value'] = WC()->customer->get_shipping_city();
-	}
-	
-
-	return $fields;
-	}
-add_filter( 'woocommerce_checkout_fields' , 'custom_shipping_wc_checkout_fields' );

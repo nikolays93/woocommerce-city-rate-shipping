@@ -7,9 +7,12 @@ if ( 'no' === get_option( 'woocommerce_enable_shipping_calc' ) || ! WC()->cart->
 
 $input_class = apply_filters( 'shipping_calculator_input_class', 'form-control' );
 
-$current_cc = WC()->customer->get_shipping_country();
-$current_r  = WC()->customer->get_shipping_state();
-$states     = WC()->countries->get_states( $current_cc );
+$current_cc   = WC()->customer->get_shipping_country();
+$current_r    = WC()->customer->get_shipping_state();
+$current_city = WC()->customer->get_shipping_city();
+
+$states       = WC()->countries->get_states( $current_cc );
+$cities       = apply_filters( 'woocommerce_custom_cities', $current_r );
 ?>
 
 <?php do_action( 'woocommerce_before_shipping_calculator' ); ?>
@@ -57,9 +60,28 @@ $states     = WC()->countries->get_states( $current_cc );
 		</p>
 
 		<?php
-		if ( apply_filters( 'woocommerce_shipping_calculator_enable_city', false ) )
-			do_action( 'form_input_cities' );
-		?>
+		if ( apply_filters( 'woocommerce_shipping_calculator_enable_city', true ) )
+
+			if( $cities ){
+				?>
+				<p class="form-row form-row-wide" id="calc_shipping_city_field">
+					<select id="calc_shipping_city" name="calc_shipping_city" class="input-text <?php echo $input_class; ?>" placeholder="<?php esc_attr_e( 'City', 'woocommerce' ); ?>">
+
+						<?php
+						echo "<option value=''>" . __("- Населенный пункт -") . "</option>";
+						foreach ($cities as $city) {
+							$active = ($current_city == $city) ? ' selected' : '';
+
+							echo "<option value='{$city}'{$active}>{$city}</option>";
+						}
+						echo "<option value=''>" . __("Другой населенный пункт") . "</option>";
+						?>
+					</select>
+
+				</p>
+				<?php
+			}
+			?>
 
 		<p><button type="submit" name="calc_shipping" value="1" class="button btn btn-info"><?php _e( 'Update totals', 'woocommerce' ); ?></button></p>
 
