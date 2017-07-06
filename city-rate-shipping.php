@@ -3,7 +3,7 @@
  * Plugin Name: Woocommerce Shipping Fixed Rates for each city
  * Plugin URI: https://github.com/nikolays93/woocommerce-ru-city-rate-shipping
  * Description: Custom rates for russian's cities
- * Version: 0.1
+ * Version: 1.0
  * Author: NikolayS93
  * Author URI: https://vk.com/nikolays_93
  * License: GNU General Public License v2 or later
@@ -18,9 +18,11 @@ if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins',
 
 define('CUSTOM_SHIPPING_DIR', plugin_dir_path( __FILE__ ));
 
-require_once( CUSTOM_SHIPPING_DIR . '/includes/class-wc-shipping-custom.php' );
-
 add_action( 'woocommerce_shipping_init', 'custom_shipping_init' );
+function custom_shipping_init(){
+
+	require_once( CUSTOM_SHIPPING_DIR . '/includes/class-wc-shipping-custom.php' );
+}
 
 /**
  * Set area filters
@@ -33,12 +35,19 @@ function get_custom_shipping_states( $states ){
 
 add_filter('woocommerce_custom_cities', 'get_custom_shipping_cities', 10, 2);
 function get_custom_shipping_cities( $state = false ){
+	if( $state === false )
+		return false;
+
+	$cities_arr = array('-' => '- Населенный пункт -');
 	$cities = include( CUSTOM_SHIPPING_DIR . '/includes/list-cities-ru.php' );
+	if( !isset( $cities[$state] ) )
+		return false;
 
-	if( $state !== false )
-		return isset( $cities[$state] ) ? $cities[$state] : false;
+	$cities_arr = array_merge($cities_arr, $cities[$state]);
 
-	return false;
+	$cities_arr['Другой'] = 'Другой населенный пункт';
+
+	return $cities_arr;
 }
 
 /**
@@ -64,6 +73,7 @@ function filter_wc_get_template( $located, $template_name, $args, $template_path
 add_filter( 'woocommerce_shipping_methods', 'add_custom_shipping_method' );
 function add_custom_shipping_method( $methods ) {
 	$methods['custom_shipping_method'] = 'WC_Shipping_Custom';
+
 	return $methods;
 }
 
@@ -71,11 +81,57 @@ function add_custom_shipping_method( $methods ) {
  * Custom Checkout
  */
 function custom_shipping_wc_checkout_fields( $fields ) {
-	if( WC()->customer->get_shipping_city() ){
-		$fields['billing']['billing_city']['value']   = WC()->customer->get_shipping_city();
-		$fields['shipping']['shipping_city']['value'] = WC()->customer->get_shipping_city();
-	}
+	// $current_cc   = WC()->customer->get_shipping_country();
+	$current_r    = WC()->customer->get_shipping_state();
+	// $current_city = WC()->customer->get_shipping_city();
+
+	// $states       = WC()->countries->get_states( $current_cc );
+	$cities       = apply_filters( 'woocommerce_custom_cities', $current_r );
+
+	// $fields['billing']['billing_city']['type'] = 'select';
+
+	// echo "<pre>";
+	// var_dump($fields);
+	// echo "</pre>";
+	// $city = WC()->customer->get_shipping_city();
+	
+	// if( $city == '-' || !$city )
+	// 	return $fields;
+	
+	// foreach (array('billing', 'shipping') as $type) {
+	// 	if( isset($fields[$type][$type . '_state']) )
+	// 		$fields[$type][$type . '_state']['class'][] = 'hidden hidden-xs-up';
+
+	// 	if( isset($fields[$type][$type . '_country']) )
+	// 		$fields[$type][$type . '_country']['class'][] = 'hidden hidden-xs-up';
+
+	// 	if( isset($fields[$type][$type . '_city']) ){
+	// 		$fields[$type][$type . '_city']['value'] = $city;
+	// 		$fields[$type][$type . '_city']['custom_attributes'] = array('readonly' => 'true');
+	// 	}
+	// }
 	
 	return $fields;
 }
 add_filter( 'woocommerce_checkout_fields' , 'custom_shipping_wc_checkout_fields', 50 );
+
+add_filter( 'woocommerce_shipping_calculator_enable_city', '__return_true', 10 );
+add_filter( 'woocommerce_shipping_calculator_enable_postcode', '__return_false', 10 );
+
+
+add_filter( 'woocommerce_default_address_fields' , 'customize_checkout_city_field' );
+function customize_checkout_city_field( $address_fields ) {
+
+    $current_r    = WC()->customer->get_shipping_state();
+    $cities       = apply_filters( 'woocommerce_custom_cities', $current_r );
+
+    // Customizing 'billing_city' field
+    $address_fields['city']['type'] = 'select';
+    //$address_fields['city']['class'] = array('form-row-last', 'my-custom-class'); // your class here
+    $address_fields['city']['label'] = 'Город / Населенный пункт';
+    $address_fields['city']['options'] = $cities;
+
+
+    // Returning Checkout customized fields
+    return $address_fields;
+}
