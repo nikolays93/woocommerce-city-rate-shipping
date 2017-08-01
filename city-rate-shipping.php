@@ -3,7 +3,7 @@
  * Plugin Name: Woocommerce Shipping Fixed Rates for each city
  * Plugin URI: https://github.com/nikolays93/woocommerce-ru-city-rate-shipping
  * Description: Custom rates for russian's cities
- * Version: 1.0
+ * Version: 1.1
  * Author: NikolayS93
  * Author URI: https://vk.com/nikolays_93
  * License: GNU General Public License v2 or later
@@ -22,6 +22,13 @@ add_action( 'woocommerce_shipping_init', 'custom_shipping_init' );
 function custom_shipping_init(){
 
 	require_once( CUSTOM_SHIPPING_DIR . '/includes/class-wc-shipping-custom.php' );
+}
+
+add_filter('woocommerce_countries', 'clear_countries_for_russia');
+function clear_countries_for_russia($countries){
+	//file_put_contents( __DIR__ . '/debug.log', print_r($countries, 1) );
+	// for rus only
+	return array('RU' => $countries['RU']);
 }
 
 /**
@@ -64,7 +71,7 @@ function filter_wc_get_template( $located, $template_name, $args, $template_path
 		}
 	}
 
-	return $located; 
+	return $located;
 }
 
 /**
@@ -77,49 +84,13 @@ function add_custom_shipping_method( $methods ) {
 	return $methods;
 }
 
-/**
- * Custom Checkout
- */
-function custom_shipping_wc_checkout_fields( $fields ) {
-	// $current_cc   = WC()->customer->get_shipping_country();
-	$current_r    = WC()->customer->get_shipping_state();
-	// $current_city = WC()->customer->get_shipping_city();
-
-	// $states       = WC()->countries->get_states( $current_cc );
-	$cities       = apply_filters( 'woocommerce_custom_cities', $current_r );
-
-	// $fields['billing']['billing_city']['type'] = 'select';
-
-	// echo "<pre>";
-	// var_dump($fields);
-	// echo "</pre>";
-	// $city = WC()->customer->get_shipping_city();
-	
-	// if( $city == '-' || !$city )
-	// 	return $fields;
-	
-	// foreach (array('billing', 'shipping') as $type) {
-	// 	if( isset($fields[$type][$type . '_state']) )
-	// 		$fields[$type][$type . '_state']['class'][] = 'hidden hidden-xs-up';
-
-	// 	if( isset($fields[$type][$type . '_country']) )
-	// 		$fields[$type][$type . '_country']['class'][] = 'hidden hidden-xs-up';
-
-	// 	if( isset($fields[$type][$type . '_city']) ){
-	// 		$fields[$type][$type . '_city']['value'] = $city;
-	// 		$fields[$type][$type . '_city']['custom_attributes'] = array('readonly' => 'true');
-	// 	}
-	// }
-	
-	return $fields;
-}
-add_filter( 'woocommerce_checkout_fields' , 'custom_shipping_wc_checkout_fields', 50 );
-
 add_filter( 'woocommerce_shipping_calculator_enable_city', '__return_true', 10 );
 add_filter( 'woocommerce_shipping_calculator_enable_postcode', '__return_false', 10 );
 
-
-add_filter( 'woocommerce_default_address_fields' , 'customize_checkout_city_field' );
+/**
+ * Custom Checkout
+ */
+add_filter( 'woocommerce_default_address_fields' , 'customize_checkout_city_field', 50, 1 );
 function customize_checkout_city_field( $address_fields ) {
 
     $current_r    = WC()->customer->get_shipping_state();

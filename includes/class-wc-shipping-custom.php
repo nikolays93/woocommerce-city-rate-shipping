@@ -14,7 +14,7 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 	public function __construct( $instance_id = 0 ) {
 		$this->id                    = 'custom_shipping_method';
 		$this->instance_id 			 = absint( $instance_id );
-		$this->method_title          = __( 'Fixed Rates for each city', 'woocommerce' );
+		$this->method_title          = 'Фиксированая ставка по региону/городу';
 		$this->method_description    = __( 'Lets you charge a fixed rate for shipping in for each city.', 'woocommerce' );
 		$this->supports              = array(
 			'shipping-zones',
@@ -250,7 +250,7 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 		if(	in_array($this->zone, array( WC()->customer->get_shipping_state(), WC()->customer->get_shipping_city() ) ) ){
 			$is_available = true;
 		}
-		
+
 		return apply_filters( 'woocommerce_shipping_' . $this->id . '_is_available', $is_available, $package );
 	}
 }

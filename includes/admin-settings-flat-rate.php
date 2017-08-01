@@ -27,11 +27,11 @@ $settings = array(
 		'title' 		=> __( 'Method title', 'woocommerce' ),
 		'type' 			=> 'text',
 		'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-		'default'		=> __( 'Delivery to the city', 'woocommerce' ),
+		'default'		=> 'Доставка по городу',
 		'desc_tip'		=> true,
 	),
 	'zone' => array(
-		'title' 		=> __( 'cities', 'woocommerce' ),
+		'title' 		=> __( 'State', 'woocommerce' ) . " / " .__( 'City', 'woocommerce' ),
 		'type' 			=> 'select',
 		'class'         => 'wc-enhanced-select',
 		'default' 		=> 'izh',

@@ -1,10 +1,8 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) )
-	exit; // Exit if accessed directly
+$states['RU'] = array(
+	// 'Mos'   => __( 'Москва', 'woocommerce' ),
+	'UDM' 	=> __( 'Удмуртия', 'woocommerce' ),
+	);
 
-return array('RU' => array(
-	// 'moscow'	=> __( 'Московская область', 'woocommerce' ),
-	'udm' 	=> __( 'Удмуртия', 'woocommerce' ),
-	),
-);
+return $states;

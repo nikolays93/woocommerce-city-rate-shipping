@@ -1,5 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) 
+if ( ! defined( 'ABSPATH' ) )
 	exit; // Exit if accessed directly
 
 if ( 'no' === get_option( 'woocommerce_enable_shipping_calc' ) || ! WC()->cart->needs_shipping() )
@@ -85,7 +85,6 @@ $cities       = apply_filters( 'woocommerce_custom_cities', $current_r );
 
 		<?php wp_nonce_field( 'woocommerce-cart' ); ?>
 	</section>
-	
 </form>
 
 <?php do_action( 'woocommerce_after_shipping_calculator' ); ?>
