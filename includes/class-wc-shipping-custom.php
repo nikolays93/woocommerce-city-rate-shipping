@@ -1,22 +1,22 @@
 <?php
 /**
- * @class 		WC_Shipping_Custom
- * @since 		2.6.0 Woocommerce 
+ * @class       WC_Shipping_Custom
+ * @since       2.6.0 Woocommerce
  */
 class WC_Shipping_Custom extends WC_Shipping_Method {
 
 	protected $file_settings = 'admin-settings-flat-rate.php';
-	protected $fee_cost = '';
+	protected $fee_cost      = '';
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct( $instance_id = 0 ) {
-		$this->id                    = 'custom_shipping_method';
-		$this->instance_id 			 = absint( $instance_id );
-		$this->method_title          = __( 'Fixed Rates for each city', 'woocommerce' );
-		$this->method_description    = __( 'Lets you charge a fixed rate for shipping in for each city.', 'woocommerce' );
-		$this->supports              = array(
+		$this->id                 = 'custom_shipping_method';
+		$this->instance_id        = absint( $instance_id );
+		$this->method_title       = __( 'Fixed Rates for each city', 'woocommerce' );
+		$this->method_description = __( 'Lets you charge a fixed rate for shipping in for each city.', 'woocommerce' );
+		$this->supports           = array(
 			'shipping-zones',
 			'instance-settings',
 			'instance-settings-modal',
@@ -30,7 +30,7 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 	 * init user set variables.
 	 */
 	public function init() {
-		$this->instance_form_fields = include( $this->file_settings );
+		$this->instance_form_fields = include $this->file_settings;
 		$this->title                = $this->get_option( 'title' );
 		$this->zone                 = $this->get_option( 'zone' );
 		$this->cost                 = $this->get_option( 'cost' );
@@ -39,12 +39,13 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 
 	/**
 	 * Evaluate a cost from a sum/string.
+	 *
 	 * @param  string $sum
 	 * @param  array  $args
 	 * @return string
 	 */
 	protected function evaluate_cost( $sum, $args = array() ) {
-		include_once( WC()->plugin_path() . '/includes/libraries/class-wc-eval-math.php' );
+		include_once WC()->plugin_path() . '/includes/libraries/class-wc-eval-math.php';
 
 		// Allow 3rd parties to process shipping cost arguments
 		$args           = apply_filters( 'woocommerce_evaluate_shipping_cost_args', $args, $sum, $this );
@@ -55,17 +56,19 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 		// Expand shortcodes
 		add_shortcode( 'fee', array( $this, 'fee' ) );
 
-		$sum = do_shortcode( str_replace(
-			array(
-				'[qty]',
-				'[cost]',
-			),
-			array(
-				$args['qty'],
-				$args['cost'],
-			),
-			$sum
-		) );
+		$sum = do_shortcode(
+			str_replace(
+				array(
+					'[qty]',
+					'[cost]',
+				),
+				array(
+					$args['qty'],
+					$args['cost'],
+				),
+				$sum
+			)
+		);
 
 		remove_shortcode( 'fee', array( $this, 'fee' ) );
 
@@ -84,15 +87,20 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 
 	/**
 	 * Work out fee (shortcode).
+	 *
 	 * @param  array $atts
 	 * @return string
 	 */
 	public function fee( $atts ) {
-		$atts = shortcode_atts( array(
-			'percent' => '',
-			'min_fee' => '',
-			'max_fee' => '',
-		), $atts, 'fee' );
+		$atts = shortcode_atts(
+			array(
+				'percent' => '',
+				'min_fee' => '',
+				'max_fee' => '',
+			),
+			$atts,
+			'fee'
+		);
 
 		$calculated_fee = 0;
 
@@ -130,10 +138,13 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 
 		if ( '' !== $cost ) {
 			$has_costs    = true;
-			$rate['cost'] = $this->evaluate_cost( $cost, array(
-				'qty'  => $this->get_package_item_qty( $package ),
-				'cost' => $package['contents_cost'],
-			) );
+			$rate['cost'] = $this->evaluate_cost(
+				$cost,
+				array(
+					'qty'  => $this->get_package_item_qty( $package ),
+					'cost' => $package['contents_cost'],
+				)
+			);
 		}
 
 		// Add shipping class costs.
@@ -155,10 +166,13 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 				}
 
 				$has_costs  = true;
-				$class_cost = $this->evaluate_cost( $class_cost_string, array(
-					'qty'  => array_sum( wp_list_pluck( $products, 'quantity' ) ),
-					'cost' => array_sum( wp_list_pluck( $products, 'line_total' ) ),
-				) );
+				$class_cost = $this->evaluate_cost(
+					$class_cost_string,
+					array(
+						'qty'  => array_sum( wp_list_pluck( $products, 'quantity' ) ),
+						'cost' => array_sum( wp_list_pluck( $products, 'line_total' ) ),
+					)
+				);
 
 				if ( 'class' === $this->type ) {
 					$rate['cost'] += $class_cost;
@@ -185,23 +199,24 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 		 *
 		 * This example shows how you can add an extra rate based on this flat rate via custom function:
 		 *
-		 * 		add_action( 'woocommerce_Custom_shipping_add_rate', 'add_another_custom_Custom', 10, 2 );
+		 *      add_action( 'woocommerce_Custom_shipping_add_rate', 'add_another_custom_Custom', 10, 2 );
 		 *
-		 * 		function add_another_custom_Custom( $method, $rate ) {
-		 * 			$new_rate          = $rate;
-		 * 			$new_rate['id']    .= ':' . 'custom_rate_name'; // Append a custom ID.
-		 * 			$new_rate['label'] = 'Rushed Shipping'; // Rename to 'Rushed Shipping'.
-		 * 			$new_rate['cost']  += 2; // Add $2 to the cost.
+		 *      function add_another_custom_Custom( $method, $rate ) {
+		 *          $new_rate          = $rate;
+		 *          $new_rate['id']    .= ':' . 'custom_rate_name'; // Append a custom ID.
+		 *          $new_rate['label'] = 'Rushed Shipping'; // Rename to 'Rushed Shipping'.
+		 *          $new_rate['cost']  += 2; // Add $2 to the cost.
 		 *
-		 * 			// Add it to WC.
-		 * 			$method->add_rate( $new_rate );
-		 * 		}.
+		 *          // Add it to WC.
+		 *          $method->add_rate( $new_rate );
+		 *      }.
 		 */
 		do_action( 'woocommerce_' . $this->id . '_shipping_add_rate', $this, $rate );
 	}
 
 	/**
 	 * Get items in package.
+	 *
 	 * @param  array $package
 	 * @return int
 	 */
@@ -217,6 +232,7 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 
 	/**
 	 * Finds and returns shipping classes and the products with said class.
+	 *
 	 * @param mixed $package
 	 * @return array
 	 */
@@ -247,10 +263,10 @@ class WC_Shipping_Custom extends WC_Shipping_Method {
 	public function is_available( $package ) {
 		$is_available = false;
 
-		if(	in_array($this->zone, array( WC()->customer->get_shipping_state(), WC()->customer->get_shipping_city() ) ) ){
+		if ( in_array( $this->zone, array( WC()->customer->get_shipping_state(), WC()->customer->get_shipping_city() ) ) ) {
 			$is_available = true;
 		}
-		
+
 		return apply_filters( 'woocommerce_shipping_' . $this->id . '_is_available', $is_available, $package );
 	}
 }

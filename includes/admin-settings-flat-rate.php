@@ -6,15 +6,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $cost_desc = __( 'Enter a cost (excl. tax) or sum, e.g. <code>10.00 * [qty]</code>.', 'woocommerce' ) . '<br/><br/>' . __( 'Use <code>[qty]</code> for the number of items, <br/><code>[cost]</code> for the total cost of items, and <code>[fee percent="10" min_fee="20" max_fee=""]</code> for percentage based fees.', 'woocommerce' );
 
-$states = include( CUSTOM_SHIPPING_DIR . '/includes/list-states.php' );
-$cities = include( CUSTOM_SHIPPING_DIR . '/includes/list-cities-ru.php' );
+$states = include CUSTOM_SHIPPING_DIR . '/includes/list-states.php';
+$cities = include CUSTOM_SHIPPING_DIR . '/includes/list-cities-ru.php';
 
 $list_areas = array();
-foreach ($states['RU'] as $state => $state_label) {
-	$list_areas[$state] = $state_label;
-	if( isset($cities[$state]) ){
-		foreach ($cities[$state] as $city_label) {
-			$list_areas[$city_label] = '-- '.$city_label;
+foreach ( $states['RU'] as $state => $state_label ) {
+	$list_areas[ $state ] = $state_label;
+	if ( isset( $cities[ $state ] ) ) {
+		foreach ( $cities[ $state ] as $city_label ) {
+			$list_areas[ $city_label ] = '-- ' . $city_label;
 		}
 	}
 }
@@ -24,26 +24,26 @@ foreach ($states['RU'] as $state => $state_label) {
  */
 $settings = array(
 	'title' => array(
-		'title' 		=> __( 'Method title', 'woocommerce' ),
-		'type' 			=> 'text',
-		'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-		'default'		=> __( 'Delivery to the city', 'woocommerce' ),
-		'desc_tip'		=> true,
+		'title'       => __( 'Method title', 'woocommerce' ),
+		'type'        => 'text',
+		'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
+		'default'     => __( 'Delivery to the city', 'woocommerce' ),
+		'desc_tip'    => true,
 	),
-	'zone' => array(
-		'title' 		=> __( 'cities', 'woocommerce' ),
-		'type' 			=> 'select',
-		'class'         => 'wc-enhanced-select',
-		'default' 		=> 'izh',
-		'options'		=> $list_areas,
+	'zone'  => array(
+		'title'   => __( 'cities', 'woocommerce' ),
+		'type'    => 'select',
+		'class'   => 'wc-enhanced-select',
+		'default' => 'izh',
+		'options' => $list_areas,
 	),
-	'cost' => array(
-		'title' 		=> __( 'Cost', 'woocommerce' ),
-		'type' 			=> 'text',
-		'placeholder'	=> '',
-		'description'	=> $cost_desc,
-		'default'		=> '0',
-		'desc_tip'		=> true,
+	'cost'  => array(
+		'title'       => __( 'Cost', 'woocommerce' ),
+		'type'        => 'text',
+		'placeholder' => '',
+		'description' => $cost_desc,
+		'default'     => '0',
+		'desc_tip'    => true,
 	),
 );
 
