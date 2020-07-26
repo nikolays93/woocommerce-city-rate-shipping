@@ -38,14 +38,14 @@ function get_custom_shipping_cities( $state = false ){
 	if( $state === false )
 		return false;
 
-	$cities_arr = array('-' => '- Населенный пункт -');
+	$cities_arr = array( '-' => __( '- Населенный пункт -', 'wsfrfec' ) );
 	$cities = include( CUSTOM_SHIPPING_DIR . '/includes/list-cities-ru.php' );
 	if( !isset( $cities[$state] ) )
 		return false;
 
 	$cities_arr = array_merge($cities_arr, $cities[$state]);
 
-	$cities_arr['Другой'] = 'Другой населенный пункт';
+	$cities_arr['Другой'] = __( 'Другой населенный пункт', 'wsfrfec' );
 
 	return $cities_arr;
 }
@@ -60,11 +60,11 @@ function filter_wc_get_template( $located, $template_name, $args, $template_path
 		if( is_readable($file) )
 			$located = $file;
 		elseif( WP_DEBUG ){
-			echo "Файл <strong>template/shipping-calculator.php</strong> не найден";
+			echo "File <strong>template/shipping-calculator.php</strong> not found.";
 		}
 	}
 
-	return $located; 
+	return $located;
 }
 
 /**
