@@ -81,12 +81,21 @@ function add_custom_shipping_method( $methods ) {
  * Custom Checkout
  */
 function custom_shipping_wc_checkout_fields( $fields ) {
+    /** @var WooCommerce */
+    $woocommerce = WC();
+
+    if ( ! isset( $woocommerce->customer ) || ! $woocommerce->customer instanceof WC_Customer ) {
+        return $fields;
+    }
+
+    $wc_customer    = $woocommerce->customer;
+    $shipping_state = $wc_customer->get_shipping_state();
+    $cities         = apply_filters( 'woocommerce_custom_cities', $shipping_state );
+
 	// $current_cc   = WC()->customer->get_shipping_country();
-	$current_r    = WC()->customer->get_shipping_state();
 	// $current_city = WC()->customer->get_shipping_city();
 
 	// $states       = WC()->countries->get_states( $current_cc );
-	$cities       = apply_filters( 'woocommerce_custom_cities', $current_r );
 
 	// $fields['billing']['billing_city']['type'] = 'select';
 
@@ -121,16 +130,21 @@ add_filter( 'woocommerce_shipping_calculator_enable_postcode', '__return_false',
 
 add_filter( 'woocommerce_default_address_fields' , 'customize_checkout_city_field' );
 function customize_checkout_city_field( $address_fields ) {
+    /** @var WooCommerce */
+    $woocommerce = WC();
 
-    $current_r    = WC()->customer->get_shipping_state();
-    $cities       = apply_filters( 'woocommerce_custom_cities', $current_r );
+    if ( ! isset( $woocommerce->customer ) || ! $woocommerce->customer instanceof WC_Customer ) {
+        return $address_fields;
+    }
+
+    $wc_customer    = $woocommerce->customer;
+    $shipping_state = $wc_customer->get_shipping_state();
+    $cities         = apply_filters( 'woocommerce_custom_cities', $shipping_state );
 
     // Customizing 'billing_city' field
-    $address_fields['city']['type'] = 'select';
-    //$address_fields['city']['class'] = array('form-row-last', 'my-custom-class'); // your class here
-    $address_fields['city']['label'] = 'Город / Населенный пункт';
+    $address_fields['city']['type']    = 'select';
+    $address_fields['city']['label']   = __( 'Город / Населенный пункт', 'wsfrfec' );
     $address_fields['city']['options'] = $cities;
-
 
     // Returning Checkout customized fields
     return $address_fields;
